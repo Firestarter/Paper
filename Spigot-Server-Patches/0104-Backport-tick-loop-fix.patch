@@ -1,0 +1,39 @@
+From 8dc696935a9b63244fc9101b2a837ce37592faec Mon Sep 17 00:00:00 2001
+From: Mykyta Komarn <nkomarn@hotmail.com>
+Date: Mon, 10 Aug 2020 12:20:37 -0700
+Subject: [PATCH] Backport tick loop fix
+
+
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 3c9d177c..99e18729 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -584,19 +584,22 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+                     // PaperSpigot start - Further improve tick loop
+                     wait = TICK_TIME - (curTime - lastTick);
+                     if (wait > 0) {
++                        // Paper - backport tick loop fixes
+                         if (catchupTime < 2E6) {
+                             wait += Math.abs(catchupTime);
+                         }
+-                        if (wait < catchupTime) {
++                        else if (wait < catchupTime) {
+                             catchupTime -= wait;
+                             wait = 0;
+-                        } else if (catchupTime > 2E6) {
++                        } else {
+                             wait -= catchupTime;
+-                            catchupTime -= catchupTime;
++                            catchupTime = 0;
+                         }
++                        // Paper end
+                     }
+                     if (wait > 0) {
+                         Thread.sleep(wait / 1000000);
++                        curTime = System.nanoTime(); // Paper
+                         wait = TICK_TIME - (curTime - lastTick);
+                     }
+ 
+-- 
+2.25.1
+
