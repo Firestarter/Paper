@@ -1,0 +1,71 @@
+From eb3a4565b37f3d306a7653745e9421d2da61dda9 Mon Sep 17 00:00:00 2001
+From: Mykyta Komarn <nkomarn@hotmail.com>
+Date: Tue, 11 Aug 2020 16:30:00 -0700
+Subject: [PATCH] Remove Block Physics Event
+
+
+diff --git a/src/main/java/net/minecraft/server/BlockPlant.java b/src/main/java/net/minecraft/server/BlockPlant.java
+index c1110242..9a3dcecc 100644
+--- a/src/main/java/net/minecraft/server/BlockPlant.java
++++ b/src/main/java/net/minecraft/server/BlockPlant.java
+@@ -44,15 +44,15 @@ public class BlockPlant extends Block {
+ 
+     protected void e(World world, BlockPosition blockposition, IBlockData iblockdata) {
+         if (!this.f(world, blockposition, iblockdata)) {
+-            // CraftBukkit Start
+-            org.bukkit.block.Block block = world.getWorld().getBlockAt(blockposition.getX(), blockposition.getY(), blockposition.getZ());
+-            BlockPhysicsEvent event = new BlockPhysicsEvent(block, block.getTypeId());
+-            world.getServer().getPluginManager().callEvent(event);
+-
+-            if (event.isCancelled()) {
+-                return;
+-            }
+-            // CraftBukkit end
++            // CraftBukkit Start // Paper - remove block physics event
++            // org.bukkit.block.Block block = world.getWorld().getBlockAt(blockposition.getX(), blockposition.getY(), blockposition.getZ());
++            // BlockPhysicsEvent event = new BlockPhysicsEvent(block, block.getTypeId());
++            // world.getServer().getPluginManager().callEvent(event);
++            //
++            // if (event.isCancelled()) {
++            //     return;
++            // }
++            // CraftBukkit end // Paper end
+             this.b(world, blockposition, iblockdata, 0);
+             world.setTypeAndData(blockposition, Blocks.AIR.getBlockData(), 3);
+         }
+diff --git a/src/main/java/net/minecraft/server/World.java b/src/main/java/net/minecraft/server/World.java
+index 8f3511f8..180290bb 100644
+--- a/src/main/java/net/minecraft/server/World.java
++++ b/src/main/java/net/minecraft/server/World.java
+@@ -569,17 +569,17 @@ public abstract class World implements IBlockAccess {
+             IBlockData iblockdata = this.getType(blockposition);
+ 
+             try {
+-                // CraftBukkit start
+-                CraftWorld world = ((WorldServer) this).getWorld();
+-                if (world != null) {
+-                    BlockPhysicsEvent event = new BlockPhysicsEvent(world.getBlockAt(blockposition.getX(), blockposition.getY(), blockposition.getZ()), CraftMagicNumbers.getId(block));
+-                    this.getServer().getPluginManager().callEvent(event);
+-
+-                    if (event.isCancelled()) {
+-                        return;
+-                    }
+-                }
+-                // CraftBukkit end
++                // CraftBukkit start // Paper - remove block physics event
++                // CraftWorld world = ((WorldServer) this).getWorld();
++                // if (world != null) {
++                //     BlockPhysicsEvent event = new BlockPhysicsEvent(world.getBlockAt(blockposition.getX(), blockposition.getY(), blockposition.getZ()), CraftMagicNumbers.getId(block));
++                //     this.getServer().getPluginManager().callEvent(event);
++                //
++                //     if (event.isCancelled()) {
++                //         return;
++                //     }
++                // }
++                // CraftBukkit end // Paper end
+                 iblockdata.getBlock().doPhysics(this, blockposition, iblockdata, block);
+             } catch (StackOverflowError stackoverflowerror) { // Spigot Start
+                 haveWeSilencedAPhysicsCrash = true;
+-- 
+2.25.1
+
