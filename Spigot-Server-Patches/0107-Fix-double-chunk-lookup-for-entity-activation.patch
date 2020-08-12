@@ -1,0 +1,29 @@
+From 041b2b268dcea08d8db6dba9c9e03d10cc4b94c3 Mon Sep 17 00:00:00 2001
+From: Mykyta Komarn <nkomarn@hotmail.com>
+Date: Wed, 12 Aug 2020 09:57:07 -0700
+Subject: [PATCH] Fix double chunk lookup for entity activation
+
+
+diff --git a/src/main/java/org/spigotmc/ActivationRange.java b/src/main/java/org/spigotmc/ActivationRange.java
+index d3767d2a..a690875f 100644
+--- a/src/main/java/org/spigotmc/ActivationRange.java
++++ b/src/main/java/org/spigotmc/ActivationRange.java
+@@ -128,10 +128,13 @@ public class ActivationRange
+             {
+                 for ( int j1 = k; j1 <= l; ++j1 )
+                 {
+-                    if ( world.getWorld().isChunkLoaded( i1, j1 ) )
++                    // Paper start - fix double chunk lookup
++                    Chunk chunk = world.getChunkIfLoaded(i1, j1);
++                    if ( chunk != null )
+                     {
+-                        activateChunkEntities( world.getChunkAt( i1, j1 ) );
++                        activateChunkEntities( chunk );
+                     }
++                    // Paper end
+                 }
+             }
+         }
+-- 
+2.25.1
+
