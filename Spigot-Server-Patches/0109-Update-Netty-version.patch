@@ -1,0 +1,25 @@
+From 0e63a8401ee77b1e3d2112d8b9d5ab50c2f62431 Mon Sep 17 00:00:00 2001
+From: Mykyta Komarn <nkomarn@hotmail.com>
+Date: Wed, 12 Aug 2020 13:16:17 -0700
+Subject: [PATCH] Update Netty version
+
+
+diff --git a/pom.xml b/pom.xml
+index db4b5bd1..b6d63034 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -94,6 +94,11 @@
+             <artifactId>fastutil</artifactId>
+             <version>8.4.1</version>
+         </dependency>
++        <dependency>
++            <groupId>io.netty</groupId>
++            <artifactId>netty-all</artifactId>
++            <version>4.1.51.Final</version>
++        </dependency>
+     </dependencies>
+ 
+     <!-- required until fixed plexus-compiler-eclipse is deployed -->
+-- 
+2.25.1
+
