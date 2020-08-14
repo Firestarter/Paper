@@ -1,0 +1,22 @@
+From df6560b5bc78bec0a2576eda5f7ef39e3098b591 Mon Sep 17 00:00:00 2001
+From: Mykyta Komarn <nkomarn@hotmail.com>
+Date: Thu, 13 Aug 2020 19:38:58 -0700
+Subject: [PATCH] Decrement chunk thread count
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/chunkio/ChunkIOExecutor.java b/src/main/java/org/bukkit/craftbukkit/chunkio/ChunkIOExecutor.java
+index 69e5da4c..1163117f 100644
+--- a/src/main/java/org/bukkit/craftbukkit/chunkio/ChunkIOExecutor.java
++++ b/src/main/java/org/bukkit/craftbukkit/chunkio/ChunkIOExecutor.java
+@@ -7,7 +7,7 @@ import net.minecraft.server.World;
+ import org.bukkit.craftbukkit.util.AsynchronousExecutor;
+ 
+ public class ChunkIOExecutor {
+-    static final int BASE_THREADS = 2; // PaperSpigot - Bumped value
++    static final int BASE_THREADS = 1; // PaperSpigot - Bumped value // Paper - decrease thread count
+     static final int PLAYERS_PER_THREAD = 50;
+ 
+     private static final AsynchronousExecutor<QueuedChunk, Chunk, Runnable, RuntimeException> instance = new AsynchronousExecutor<QueuedChunk, Chunk, Runnable, RuntimeException>(new ChunkIOProvider(), BASE_THREADS);
+-- 
+2.25.1
+
