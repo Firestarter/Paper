@@ -1,0 +1,180 @@
+From f93b73965e354126953a673a8db71565485716d8 Mon Sep 17 00:00:00 2001
+From: Mykyta Komarn <nkomarn@hotmail.com>
+Date: Thu, 13 Aug 2020 21:19:24 -0700
+Subject: [PATCH] Use HashMap instead of TreeMap in GameRules
+
+By using a HashMap, we are able to achieve O(1) complexity and greatly reduce the CPU time taken to check gamerules.
+
+Before: https://imgur.com/TL8mA8z
+After: https://imgur.com/ujKesd1
+
+diff --git a/src/main/java/net/minecraft/server/GameRules.java b/src/main/java/net/minecraft/server/GameRules.java
+new file mode 100644
+index 00000000..e4903053
+--- /dev/null
++++ b/src/main/java/net/minecraft/server/GameRules.java
+@@ -0,0 +1,161 @@
++package net.minecraft.server;
++
++import java.util.HashMap;
++import java.util.Iterator;
++import java.util.Set;
++import java.util.TreeMap;
++
++public class GameRules {
++
++    private HashMap<String, GameRuleValue> a = new HashMap<>(); // Paper - use hashmap for gamerules
++
++    public GameRules() {
++        this.a("doFireTick", "true", EnumGameRuleType.BOOLEAN_VALUE);
++        this.a("mobGriefing", "true", EnumGameRuleType.BOOLEAN_VALUE);
++        this.a("keepInventory", "false", EnumGameRuleType.BOOLEAN_VALUE);
++        this.a("doMobSpawning", "true", EnumGameRuleType.BOOLEAN_VALUE);
++        this.a("doMobLoot", "true", EnumGameRuleType.BOOLEAN_VALUE);
++        this.a("doTileDrops", "true", EnumGameRuleType.BOOLEAN_VALUE);
++        this.a("doEntityDrops", "true", EnumGameRuleType.BOOLEAN_VALUE);
++        this.a("commandBlockOutput", "true", EnumGameRuleType.BOOLEAN_VALUE);
++        this.a("naturalRegeneration", "true", EnumGameRuleType.BOOLEAN_VALUE);
++        this.a("doDaylightCycle", "true", EnumGameRuleType.BOOLEAN_VALUE);
++        this.a("logAdminCommands", "true", EnumGameRuleType.BOOLEAN_VALUE);
++        this.a("showDeathMessages", "true", EnumGameRuleType.BOOLEAN_VALUE);
++        this.a("randomTickSpeed", "3", EnumGameRuleType.NUMERICAL_VALUE);
++        this.a("sendCommandFeedback", "true", EnumGameRuleType.BOOLEAN_VALUE);
++        this.a("reducedDebugInfo", "false", EnumGameRuleType.BOOLEAN_VALUE);
++    }
++
++    public void a(String s, String s1, EnumGameRuleType gamerules_enumgameruletype) {
++        this.a.put(s, new GameRuleValue(s1, gamerules_enumgameruletype));
++    }
++
++    public void set(String s, String s1) {
++        GameRuleValue gamerules_gamerulevalue = (GameRuleValue) this.a.get(s);
++
++        if (gamerules_gamerulevalue != null) {
++            gamerules_gamerulevalue.a(s1);
++        } else {
++            this.a(s, s1, EnumGameRuleType.ANY_VALUE);
++        }
++
++    }
++
++    public String get(String s) {
++        GameRuleValue gamerules_gamerulevalue = (GameRuleValue) this.a.get(s);
++
++        return gamerules_gamerulevalue != null ? gamerules_gamerulevalue.a() : "";
++    }
++
++    public boolean getBoolean(String s) {
++        GameRuleValue gamerules_gamerulevalue = (GameRuleValue) this.a.get(s);
++
++        return gamerules_gamerulevalue != null ? gamerules_gamerulevalue.b() : false;
++    }
++
++    public int c(String s) {
++        GameRuleValue gamerules_gamerulevalue = (GameRuleValue) this.a.get(s);
++
++        return gamerules_gamerulevalue != null ? gamerules_gamerulevalue.c() : 0;
++    }
++
++    public NBTTagCompound a() {
++        NBTTagCompound nbttagcompound = new NBTTagCompound();
++        Iterator iterator = this.a.keySet().iterator();
++
++        while (iterator.hasNext()) {
++            String s = (String) iterator.next();
++            GameRuleValue gamerules_gamerulevalue = (GameRuleValue) this.a.get(s);
++
++            nbttagcompound.setString(s, gamerules_gamerulevalue.a());
++        }
++
++        return nbttagcompound;
++    }
++
++    public void a(NBTTagCompound nbttagcompound) {
++        Set set = nbttagcompound.c();
++        Iterator iterator = set.iterator();
++
++        while (iterator.hasNext()) {
++            String s = (String) iterator.next();
++            String s1 = nbttagcompound.getString(s);
++
++            this.set(s, s1);
++        }
++
++    }
++
++    public String[] getGameRules() {
++        Set set = this.a.keySet();
++
++        return (String[]) set.toArray(new String[set.size()]);
++    }
++
++    public boolean contains(String s) {
++        return this.a.containsKey(s);
++    }
++
++    public boolean a(String s, EnumGameRuleType gamerules_enumgameruletype) {
++        GameRuleValue gamerules_gamerulevalue = (GameRuleValue) this.a.get(s);
++
++        return gamerules_gamerulevalue != null && (gamerules_gamerulevalue.e() == gamerules_enumgameruletype || gamerules_enumgameruletype == EnumGameRuleType.ANY_VALUE);
++    }
++
++    public static enum EnumGameRuleType {
++
++        ANY_VALUE, BOOLEAN_VALUE, NUMERICAL_VALUE;
++
++        private EnumGameRuleType() {}
++    }
++
++    static class GameRuleValue {
++
++        private String a;
++        private boolean b;
++        private int c;
++        private double d;
++        private final EnumGameRuleType e;
++
++        public GameRuleValue(String s, EnumGameRuleType gamerules_enumgameruletype) {
++            this.e = gamerules_enumgameruletype;
++            this.a(s);
++        }
++
++        public void a(String s) {
++            this.a = s;
++            this.b = Boolean.parseBoolean(s);
++            this.c = this.b ? 1 : 0;
++
++            try {
++                this.c = Integer.parseInt(s);
++            } catch (NumberFormatException numberformatexception) {
++                ;
++            }
++
++            try {
++                this.d = Double.parseDouble(s);
++            } catch (NumberFormatException numberformatexception1) {
++                ;
++            }
++
++        }
++
++        public String a() {
++            return this.a;
++        }
++
++        public boolean b() {
++            return this.b;
++        }
++
++        public int c() {
++            return this.c;
++        }
++
++        public EnumGameRuleType e() {
++            return this.e;
++        }
++    }
++}
+-- 
+2.25.1
+
