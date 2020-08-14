@@ -1,0 +1,31 @@
+From 6f78242f21a07a9d27067df76e1fc1821bac3cf0 Mon Sep 17 00:00:00 2001
+From: Mykyta Komarn <nkomarn@hotmail.com>
+Date: Thu, 13 Aug 2020 19:33:42 -0700
+Subject: [PATCH] Fix decompile errors with OpenJDK
+
+
+diff --git a/src/main/java/org/spigotmc/CustomTimingsHandler.java b/src/main/java/org/spigotmc/CustomTimingsHandler.java
+index 7e89b97b..48b0e82d 100644
+--- a/src/main/java/org/spigotmc/CustomTimingsHandler.java
++++ b/src/main/java/org/spigotmc/CustomTimingsHandler.java
+@@ -30,7 +30,7 @@ import co.aikar.timings.NullTimingHandler;
+ import co.aikar.timings.Timing;
+ import co.aikar.timings.Timings;
+ import co.aikar.timings.TimingsManager;
+-import sun.reflect.Reflection;
++// import sun.reflect.Reflection;
+ 
+ import java.lang.reflect.Method;
+ import java.util.logging.Level;
+@@ -52,7 +52,7 @@ public final class CustomTimingsHandler {
+ 
+         Plugin plugin = null;
+         try {
+-             plugin = TimingsManager.getPluginByClassloader(Reflection.getCallerClass(2));
++             // plugin = TimingsManager.getPluginByClassloader(Reflection.getCallerClass(2));
+         } catch (Exception ignored) {}
+ 
+         new AuthorNagException("Deprecated use of CustomTimingsHandler. Please Switch to Timings.of ASAP").printStackTrace();
+-- 
+2.25.1
+
