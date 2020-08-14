@@ -1,0 +1,62 @@
+From 00371508c59054649e1b4b1b6f4a4d97c6df1de2 Mon Sep 17 00:00:00 2001
+From: Mykyta Komarn <nkomarn@hotmail.com>
+Date: Thu, 13 Aug 2020 21:48:41 -0700
+Subject: [PATCH] Use FastUtil map for StructureGenerator
+
+
+diff --git a/src/main/java/net/minecraft/server/StructureGenerator.java b/src/main/java/net/minecraft/server/StructureGenerator.java
+index e76acfc4..66c9a5c3 100644
+--- a/src/main/java/net/minecraft/server/StructureGenerator.java
++++ b/src/main/java/net/minecraft/server/StructureGenerator.java
+@@ -1,6 +1,9 @@
+ package net.minecraft.server;
+ 
+ import com.google.common.collect.Maps;
++import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
++import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
++
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Map;
+@@ -10,7 +13,7 @@ import java.util.concurrent.Callable;
+ public abstract class StructureGenerator extends WorldGenBase {
+ 
+     private PersistentStructure d;
+-    protected Map<Long, StructureStart> e = Maps.newHashMap();
++    protected Long2ObjectMap<StructureStart> e = new Long2ObjectOpenHashMap<>(); // Paper - user faster map implementation
+ 
+     public StructureGenerator() {}
+ 
+@@ -18,14 +21,18 @@ public abstract class StructureGenerator extends WorldGenBase {
+ 
+     protected final void a(World world, final int i, final int j, int k, int l, ChunkSnapshot chunksnapshot) {
+         this.a(world);
+-        if (!this.e.containsKey(Long.valueOf(ChunkCoordIntPair.a(i, j)))) {
++
++        // Paper start
++        long hash = ChunkCoordIntPair.a(i, j);
++        if (!this.e.containsKey(hash)) {
+             this.b.nextInt();
+ 
+             try {
+                 if (this.a(i, j)) {
+                     StructureStart structurestart = this.b(i, j);
+ 
+-                    this.e.put(Long.valueOf(ChunkCoordIntPair.a(i, j)), structurestart);
++                    this.e.put(hash, structurestart);
++                    // Paper end
+                     this.a(i, j, structurestart);
+                 }
+ 
+@@ -226,7 +233,7 @@ public abstract class StructureGenerator extends WorldGenBase {
+                             StructureStart structurestart = WorldGenFactory.a(nbttagcompound1, world);
+ 
+                             if (structurestart != null) {
+-                                this.e.put(Long.valueOf(ChunkCoordIntPair.a(i, j)), structurestart);
++                                this.e.put(ChunkCoordIntPair.a(i, j), structurestart); // Paper
+                             }
+                         }
+                     }
+-- 
+2.25.1
+
